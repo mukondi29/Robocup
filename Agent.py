@@ -296,13 +296,13 @@ class Agent(Base_Agent):
         elif current_mode == self.world.M_THEIR_KICKOFF:
             return "move"
 
-        elif current_mode in [self.world.M_OUR_KICKIN,
+        elif current_mode in [self.world.M_OUR_KICK_IN,
                                 self.world.M_OUR_CORNER_KICK,
                                 self.world.M_OUR_FREE_KICK]:
            
             return "kick" if strategyData.active_player_unum == my_player_number else "move"
 
-        elif current_mode in [self.world.M_THEIR_KICKIN,
+        elif current_mode in [self.world.M_THEIR_KICK_IN,
                                 self.world.M_THEIR_CORNER_KICK,
                                 self.world.M_THEIR_FREE_KICK]:
             
@@ -322,10 +322,6 @@ class Agent(Base_Agent):
 
         elif current_mode == self.world.M_PLAY_ON:
             return "normal"
-
-        elif current_mode == self.world.M_DROP_BALL:
-            
-            return "move"
 
         elif current_mode == self.world.M_GAME_OVER:
             return "none"
