@@ -287,48 +287,20 @@ class Agent(Base_Agent):
         current_mode = strategyData.play_mode
         my_player_number = strategyData.player_unum
 
-        if current_mode == self.world.M_BEFORE_KICKOFF:
+        #if they have the ball, we must move into formation
+        if current_mode in [self.world.M_THEIR_KICKOFF,
+                            self.world.M_THEIR_KICK_IN,
+                            self.world.M_THEIR_CORNER_KICK,
+                            self.world.M_THEIR_GOAL_KICK,
+                            self.world.M_THEIR_FREE_KICK,
+                            self.world.M_THEIR_PASS,
+                            self.world.M_THEIR_DIR_FREE_KICK,
+                            self.world.M_THEIR_GOAL,
+                            self.world.M_THEIR_OFFSIDE]:
             return "move"
-
-        elif current_mode == self.world.M_OUR_KICKOFF:
-            return "kick" if my_player_number == 1 else "move"
-
-        elif current_mode == self.world.M_THEIR_KICKOFF:
-            return "move"
-
-        elif current_mode in [self.world.M_OUR_KICK_IN,
-                                self.world.M_OUR_CORNER_KICK,
-                                self.world.M_OUR_FREE_KICK]:
-           
-            return "kick" if strategyData.active_player_unum == my_player_number else "move"
-
-        elif current_mode in [self.world.M_THEIR_KICK_IN,
-                                self.world.M_THEIR_CORNER_KICK,
-                                self.world.M_THEIR_FREE_KICK]:
-            
-            return "move"
-
-        elif current_mode == self.world.M_OUR_GOAL_KICK:
-            return "kick" if my_player_number == 1 else "move"
-
-        elif current_mode == self.world.M_THEIR_GOAL_KICK:
-            return "move"
-
-        elif current_mode == self.world.M_OUR_PENALTY:
-            return "kick" if my_player_number == 1 else "move"
-
-        elif current_mode == self.world.M_THEIR_PENALTY:
-            return "move"
-
-        elif current_mode == self.world.M_PLAY_ON:
-            return "normal"
-
-        elif current_mode == self.world.M_GAME_OVER:
-            return "none"
 
         else:
-            return "none"
-
+            return "normal"
 
 
     
@@ -336,30 +308,21 @@ class Agent(Base_Agent):
         drawer = self.world.draw
         mode_action = self.handle_game_mode(strategyData)
 
-        if mode_action == "kick":
-            target = strategyData.kick_Target(strategyData)
-            drawer.annotation((0, 0), "KICK MODE", drawer.Color.yellow, "status")
-            return self.kickTarget(strategyData, strategyData.mypos, target)
-
-        elif mode_action == "move":
-            target = strategyData.move_Target(strategyData)
-            drawer.annotation((0, 0), "MOVE MODE", drawer.Color.blue, "status")
-            return self.move(target, orientation=strategyData.ball_dir)
-
-        elif mode_action == "normal":
-            # Regular play
+        if mode_action == "normal":
             if self.am_i_the_active_player(strategyData) and self.am_i_close_enough_to_kick(strategyData):
                 target = strategyData.kick_Target(strategyData)
-                drawer.annotation((0, 0), "PLAY ON: KICKING", drawer.Color.green, "status")
+                drawer.annotation((0, 0), "KICKING", drawer.Color.green, "status")
                 return self.kickTarget(strategyData, strategyData.mypos, target)
             else:
                 target = strategyData.move_Target(strategyData)
-                drawer.annotation((0, 0), "PLAY ON: MOVING", drawer.Color.blue, "status")
+                drawer.annotation((0, 0), "MOVING", drawer.Color.blue, "status")
                 return self.move(target, orientation=strategyData.ball_dir)
 
-        elif mode_action == "none":
-            drawer.annotation((0, 0), "IDLE", drawer.Color.white, "status")
-            return None
+        elif mode_action == "move":
+            target = strategyData.move_Target(strategyData)
+            drawer.annotation((0, 0), "MOVE MODE", drawer.Color.yellow, "status")
+            return self.move(target, orientation=strategyData.ball_dir)
+
 
 
     #--------------------------------------- Fat proxy auxiliary methods
